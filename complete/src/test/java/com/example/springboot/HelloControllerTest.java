@@ -20,10 +20,6 @@ class HelloControllerTest {
   @Autowired
   private MockMvc mvc;
 
-  HelloControllerTest() {
-    // Constructor to satisfy PMD AtLeastOneConstructor rule
-  }
-
   @Test
   void helloEndpointReturnsCorrectResponse() throws Exception {
     mvc.perform(get("/").accept(MediaType.APPLICATION_JSON))

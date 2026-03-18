@@ -9,13 +9,13 @@ import org.springframework.test.web.servlet.client.RestTestClient;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureRestTestClient
-public class HelloControllerIntegrationTest {
+class HelloControllerIntegrationTest {
 
   @Autowired
   private RestTestClient client;
 
   @Test
-  public void getHello() {
+  void helloEndpointReturnsCorrectResponse() {
     client.get().uri("/").exchangeSuccessfully()
         .expectBody(String.class)
         .isEqualTo("Greetings from Spring Boot!");

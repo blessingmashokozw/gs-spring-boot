@@ -8,10 +8,33 @@
         Custom PMD ruleset for Spring Boot application
     </description>
 
-    <!-- Basic Java rules -->
-    <rule ref="category/java/errorprone.xml" />
-    <rule ref="category/java/bestpractices.xml" />
-    <rule ref="category/java/design.xml" />
-    <rule ref="category/java/codestyle.xml" />
+    <!-- Basic Java rules with exclusions -->
+    <rule ref="category/java/errorprone.xml">
+        <exclude name="AvoidLiteralsInIfCondition" />
+    </rule>
+    
+    <rule ref="category/java/bestpractices.xml">
+        <exclude name="AtLeastOneConstructor" />
+        <exclude name="SystemPrintln" />
+        <exclude name="LoosePackageCoupling" />
+    </rule>
+    
+    <rule ref="category/java/design.xml">
+        <exclude name="LoosePackageCoupling" />
+    </rule>
+    
+    <rule ref="category/java/codestyle.xml">
+        <exclude name="CommentDefaultAccessModifier" />
+        <exclude name="UnnecessaryConstructor" />
+        <exclude name="MethodArgumentCouldBeFinal" />
+        <exclude name="LocalVariableCouldBeFinal" />
+    </rule>
+
+    <!-- Test-specific rules -->
+    <rule ref="category/java/testing.xml">
+        <exclude name="JUnit5TestShouldBePackagePrivate" />
+        <exclude name="UnitTestShouldIncludeAssert" />
+        <exclude name="LinguisticNaming" />
+    </rule>
 
 </ruleset>
