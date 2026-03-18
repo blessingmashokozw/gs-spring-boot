@@ -24,6 +24,15 @@ public class HelloControllerTest {
   public void getHello() throws Exception {
     mvc.perform(get("/").accept(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
         .andExpect(content().string(equalTo("Greetings from Spring Boot!")));
+  }
+
+  @Test
+  public void getStatus() throws Exception {
+    mvc.perform(get("/status").accept(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+        .andExpect(content().string(equalTo("Application is running v1!")));
   }
 }

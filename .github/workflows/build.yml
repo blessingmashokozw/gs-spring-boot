@@ -36,3 +36,24 @@ jobs:
     - name: Build with Gradle Wrapper
       working-directory: ./complete
       run: ./gradlew build
+
+    - name: Run tests
+      working-directory: ./complete
+      run: ./gradlew test
+
+    - name: Run SpotBugs Static Analysis
+      working-directory: ./complete
+      run: ./gradlew spotbugsMain spotbugsTest
+
+    - name: Run SonarLint Analysis
+      working-directory: ./complete
+      run: ./gradlew sonarlintMain
+
+    - name: Upload SAST Reports
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: sast-reports
+        path: |
+          ./complete/build/reports/spotbugs/
+          ./complete/build/reports/sonarlint/
