@@ -45,9 +45,9 @@ jobs:
       working-directory: ./complete
       run: ./gradlew spotbugsMain spotbugsTest
 
-    - name: Run SonarLint Analysis
+    - name: Run PMD Static Analysis
       working-directory: ./complete
-      run: ./gradlew sonarlintMain
+      run: ./gradlew pmdMain pmdTest
 
     - name: Upload SAST Reports
       uses: actions/upload-artifact@v4
@@ -56,4 +56,4 @@ jobs:
         name: sast-reports
         path: |
           ./complete/build/reports/spotbugs/
-          ./complete/build/reports/sonarlint/
+          ./complete/build/reports/pmd/

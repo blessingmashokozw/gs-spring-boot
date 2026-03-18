@@ -3,7 +3,7 @@ plugins {
   id 'io.spring.dependency-management' version '1.1.7'
   id 'java'
   id 'com.github.spotbugs' version '6.0.9'
-  id 'org.sonarlint.gradle' version '5.0.0.4232'
+  id 'pmd'
 }
 
 group = 'com.example'
@@ -53,4 +53,12 @@ tasks.withType(com.github.spotbugs.snom.SpotBugsTask).configureEach {
       required.set(true)
     }
   }
+}
+
+// PMD configuration
+pmd {
+  toolVersion = '7.7.0'
+  ignoreFailures = false
+  consoleOutput = true
+  rulesetFiles = files("config/pmd/ruleset.xml")
 }
