@@ -15,13 +15,17 @@ import org.springframework.test.web.servlet.MockMvc;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-public class HelloControllerTest {
+class HelloControllerTest {
 
   @Autowired
   private MockMvc mvc;
 
+  HelloControllerTest() {
+    // Constructor to satisfy PMD AtLeastOneConstructor rule
+  }
+
   @Test
-  public void getHello() throws Exception {
+  void helloEndpointReturnsCorrectResponse() throws Exception {
     mvc.perform(get("/").accept(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -29,7 +33,7 @@ public class HelloControllerTest {
   }
 
   @Test
-  public void getStatus() throws Exception {
+  void statusEndpointReturnsCorrectResponse() throws Exception {
     mvc.perform(get("/status").accept(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
