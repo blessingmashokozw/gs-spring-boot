@@ -1,0 +1,61 @@
+# .dockerignore - Exclude files from Docker build context
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Documentation
+README.md
+CONTRIBUTING.adoc
+LICENSE*
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Build artifacts
+build/
+target/
+.gradle/
+node_modules/
+
+# Test files
+test/
+**/test/
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+*.tmp
+*.temp
+.DS_Store
+Thumbs.db
+
+# Docker files (exclude from context except Dockerfile)
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+# Cache and runtime
+.cache/
+.cache/
+*.pid
+
+# Configuration files with secrets
+application-*.yml
+application-*.properties

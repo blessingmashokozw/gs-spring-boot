@@ -1,0 +1,73 @@
+# Docker-specific Spring Boot configuration
+spring:
+  profiles:
+    active: docker
+  
+  # Security configuration
+  security:
+    user:
+      name: ${MANAGEMENT_USER:admin}
+      password: ${MANAGEMENT_PASSWORD:}
+  
+  # Actuator endpoints
+  management:
+    endpoints:
+      web:
+        exposure:
+          include: health,info,metrics,env
+    endpoint:
+      health:
+        show-details: when-authorized
+    security:
+      enabled: true
+
+# Server configuration
+server:
+  port: 8080
+  address: 0.0.0.0
+  servlet:
+    context-path: /
+  tomcat:
+    remote-ip-header: x-forwarded-for
+    protocol-header: x-forwarded-proto
+
+# Logging configuration
+logging:
+  level:
+    com.example.springboot: INFO
+    org.springframework.security: DEBUG
+  file:
+    name: /app/logs/application.log
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+# Database configuration (use environment variables)
+spring.datasource:
+  url: ${DATABASE_URL:jdbc:h2:mem:testdb}
+  username: ${DATABASE_USERNAME:sa}
+  password: ${DATABASE_PASSWORD:}
+  driver-class-name: org.h2.Driver
+
+# JPA configuration
+spring.jpa:
+  hibernate:
+    ddl-auto: validate
+  show-sql: false
+  properties:
+    hibernate:
+      dialect: org.hibernate.dialect.H2Dialect
+
+# External API configuration
+external:
+  api:
+    url: ${EXTERNAL_API_URL:https://api.example.com}
+    token: ${EXTERNAL_API_TOKEN:}
+    timeout: 5000
+
+# CORS configuration
+cors:
+  allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:8080}
+  allowed-methods: GET,POST,PUT,DELETE,OPTIONS
+  allowed-headers: "*"
+  allow-credentials: true
