@@ -12,7 +12,7 @@ public class HelloController {
   }
 
   @GetMapping("/status")
-  public String index() {
+  public String status() {
     return "Application is running!";
   }
 
