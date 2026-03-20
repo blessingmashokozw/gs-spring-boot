@@ -1,0 +1,105 @@
+name: Deploy to Server
+
+on:
+  workflow_run:
+    workflows: ["Build"]
+    types:
+      - completed
+    branches:
+      - main
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        
+    - name: Cache Gradle packages
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+        restore-keys: |
+          ${{ runner.os }}-gradle-
+          
+    - name: Build with Gradle
+      run: |
+        cd complete
+        chmod +x gradlew
+        ./gradlew build
+        
+    - name: Create deployment directory
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.SERVER }}
+        username: ${{ secrets.USERNAME }}
+        password: ${{ secrets.PASSWORD }}
+        script: |
+          mkdir -p /var/apps
+          mkdir -p /var/apps/logs
+          
+    - name: Copy Dockerfile to server
+      uses: appleboy/scp-action@v0.1.7
+      with:
+        host: ${{ secrets.SERVER }}
+        username: ${{ secrets.USERNAME }}
+        password: ${{ secrets.PASSWORD }}
+        source: "Dockerfile"
+        target: "/var/apps/"
+        
+    - name: Copy application source to server
+      uses: appleboy/scp-action@v0.1.7
+      with:
+        host: ${{ secrets.SERVER }}
+        username: ${{ secrets.USERNAME }}
+        password: ${{ secrets.PASSWORD }}
+        source: "complete/"
+        target: "/var/apps/"
+        
+    - name: Deploy and restart application in Docker
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.SERVER }}
+        username: ${{ secrets.USERNAME }}
+        password: ${{ secrets.PASSWORD }}
+        script: |
+          cd /var/apps
+          
+          # Stop and remove existing container if running
+          docker stop spring-boot-app || true
+          docker rm spring-boot-app || true
+          docker rmi spring-boot-app:latest || true
+          
+          # Build Docker image
+          docker build -t spring-boot-app:latest .
+          
+          # Run new container
+          docker run -d \
+            --name spring-boot-app \
+            --restart unless-stopped \
+            -p 8080:8080 \
+            -v /var/apps/logs:/app/logs \
+            spring-boot-app:latest
+          
+          # Verify container is running
+          sleep 10
+          if docker ps | grep spring-boot-app > /dev/null; then
+            echo "Application deployed and started successfully in Docker container"
+            docker logs spring-boot-app
+          else
+            echo "Application failed to start in Docker container"
+            docker logs spring-boot-app || true
+            exit 1
+          fi
