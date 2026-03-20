@@ -5,7 +5,7 @@ COPY complete/ .
 RUN ./gradlew build
 
 # Runtime stage
-FROM openjdk:17-jdk-slim
+FROM eclipse-temurin:17-jdk
 WORKDIR /app
 COPY --from=build /app/build/libs/spring-boot-complete-0.0.1-SNAPSHOT.jar app.jar
 RUN mkdir -p /app/logs
