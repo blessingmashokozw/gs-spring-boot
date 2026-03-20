@@ -16,4 +16,9 @@ public class HelloController {
     return "Application is running v1!";
   }
 
+   @GetMapping("/version")
+  public String version() {
+    return "Application is running v1!";
+  }
+
 }
