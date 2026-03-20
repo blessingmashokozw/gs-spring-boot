@@ -66,8 +66,8 @@ jobs:
         host: ${{ secrets.SERVER }}
         username: ${{ secrets.USERNAME }}
         password: ${{ secrets.PASSWORD }}
-        source: "complete/"
-        target: "/var/apps/"
+        source: "complete/src/,complete/build.gradle,complete/settings.gradle,complete/gradlew,complete/gradlew.bat"
+        target: "/var/apps/complete/"
         
     - name: Deploy and restart application in Docker
       uses: appleboy/ssh-action@v1.0.3
