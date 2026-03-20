@@ -19,28 +19,6 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
       
-    - name: Set up JDK 17
-      uses: actions/setup-java@v4
-      with:
-        java-version: '17'
-        distribution: 'temurin'
-        
-    - name: Cache Gradle packages
-      uses: actions/cache@v4
-      with:
-        path: |
-          ~/.gradle/caches
-          ~/.gradle/wrapper
-        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-        restore-keys: |
-          ${{ runner.os }}-gradle-
-          
-    - name: Build with Gradle
-      run: |
-        cd complete
-        chmod +x gradlew
-        ./gradlew build
-        
     - name: Create deployment directory
       uses: appleboy/ssh-action@v1.0.3
       with:
@@ -51,25 +29,29 @@ jobs:
           mkdir -p /var/apps
           mkdir -p /var/apps/logs
           
-    - name: Copy Dockerfile to server
+          # Install Java if not present
+          if ! command -v java &> /dev/null; then
+            apt-get update
+            apt-get install -y openjdk-17-jdk
+          fi
+          
+    - name: Download build artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: build-artifacts
+        path: ./build-artifacts
+        
+    - name: Copy JAR file to server
       uses: appleboy/scp-action@v0.1.7
       with:
         host: ${{ secrets.SERVER }}
         username: ${{ secrets.USERNAME }}
         password: ${{ secrets.PASSWORD }}
-        source: "Dockerfile"
+        source: "build-artifacts/complete/build/libs/spring-boot-complete-0.0.1-SNAPSHOT.jar"
         target: "/var/apps/"
+        strip_components: 3
         
-    - name: Copy application source to server
-      uses: appleboy/scp-action@v0.1.7
-      with:
-        host: ${{ secrets.SERVER }}
-        username: ${{ secrets.USERNAME }}
-        password: ${{ secrets.PASSWORD }}
-        source: "complete/src/,complete/build.gradle,complete/settings.gradle,complete/gradlew,complete/gradlew.bat"
-        target: "/var/apps/complete/"
-        
-    - name: Deploy and restart application in Docker
+    - name: Deploy and restart application
       uses: appleboy/ssh-action@v1.0.3
       with:
         host: ${{ secrets.SERVER }}
@@ -78,29 +60,19 @@ jobs:
         script: |
           cd /var/apps
           
-          # Stop and remove existing container if running
-          docker stop spring-boot-app || true
-          docker rm spring-boot-app || true
-          docker rmi spring-boot-app:latest || true
+          # Stop existing application if running
+          pkill -f "spring-boot-complete" || true
+          sleep 5
           
-          # Build Docker image
-          docker build -t spring-boot-app:latest .
+          # Start the application
+          nohup java -jar spring-boot-complete-0.0.1-SNAPSHOT.jar > /var/apps/logs/application.log 2>&1 &
           
-          # Run new container
-          docker run -d \
-            --name spring-boot-app \
-            --restart unless-stopped \
-            -p 8080:8080 \
-            -v /var/apps/logs:/app/logs \
-            spring-boot-app:latest
-          
-          # Verify container is running
+          # Verify application is running
           sleep 10
-          if docker ps | grep spring-boot-app > /dev/null; then
-            echo "Application deployed and started successfully in Docker container"
-            docker logs spring-boot-app
+          if pgrep -f "spring-boot-complete" > /dev/null; then
+            echo "Application deployed and started successfully"
           else
-            echo "Application failed to start in Docker container"
-            docker logs spring-boot-app || true
+            echo "Application failed to start"
+            tail -20 /var/apps/logs/application.log
             exit 1
           fi
