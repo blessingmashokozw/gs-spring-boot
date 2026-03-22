@@ -16,6 +16,7 @@ jobs:
     environment: production
     permissions:
       contents: read
+      actions: read
     
     steps:
     - name: Checkout code
@@ -42,6 +43,7 @@ jobs:
       with:
         name: build-artifacts
         path: ./build-artifacts
+        run-id: ${{ github.event.workflow_run.id }}
         
     - name: Copy JAR file to server
       uses: appleboy/scp-action@v0.1.7
