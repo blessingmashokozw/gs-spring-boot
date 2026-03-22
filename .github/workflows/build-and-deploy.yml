@@ -93,8 +93,10 @@ jobs:
           sleep 10
           if pgrep -f "spring-boot-complete" > /dev/null; then
             echo "Application deployed and started successfully"
+            exit 0
           else
             echo "Application failed to start"
             tail -20 /var/apps/logs/application.log
             exit 1
           fi
+        script_stop: false
