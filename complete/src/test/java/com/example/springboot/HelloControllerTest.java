@@ -25,7 +25,7 @@ class HelloControllerTest {
     mvc.perform(get("/").accept(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(content().string(equalTo("Greetings from Spring Boot!")));
+        .andExpect(content().string(equalTo("Greetings from Spring Boot with docker!")));
   }
 
   @Test
