@@ -23,7 +23,7 @@ public class HelloController {
 
 
   @GetMapping("/users")
-  public String version() {
+  public String users() {
     return "You will get a list of users here!";
   }
 }
