@@ -18,6 +18,6 @@ class HelloControllerIntegrationTest {
   void helloEndpointReturnsCorrectResponse() {
     client.get().uri("/").exchangeSuccessfully()
         .expectBody(String.class)
-        .isEqualTo("Greetings from Spring Boot!");
+        .isEqualTo("Greetings from Spring Boot with docker!");
   }
 }
