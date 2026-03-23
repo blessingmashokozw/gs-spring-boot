@@ -21,4 +21,9 @@ public class HelloController {
     return "Application is running v1!";
   }
 
+
+  @GetMapping("/users")
+  public String version() {
+    return "You will get a list of users here!";
+  }
 }
