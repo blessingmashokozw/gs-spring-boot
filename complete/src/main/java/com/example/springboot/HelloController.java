@@ -24,6 +24,6 @@ public class HelloController {
 
   @GetMapping("/users")
   public String users() {
-    return "You will get a list of users here!";
+    return "You will get a list of users here with rules!";
   }
 }
